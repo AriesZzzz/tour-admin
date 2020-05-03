@@ -30,11 +30,19 @@ export const addTour = ({name, introduction, address, ticketPrice, remark, imgUr
 
 // 删除景点
 export const deleteTour = (ids) => request(`/travel/json/admin/scenicSpot/delete`, {
-    ids
+    ids: ids.toString()
 }, "DELETE")
 
 // 图片上传
-export const uploadFiles = (multipartFile) => request(`/json/admin/file/addOne`, {
+export const uploadFiles = (multipartFile) => request(`/travel/json/admin/file/addOne`, {
     multipartFile
 }, "POST")
+
+// 用户留言
+export const reqFeedback = (userNumber, content, page, limit = 5) => request(`/travel/json/admin/feedback/list`, {
+    userNumber,
+    content,
+    page,
+    limit
+})
 

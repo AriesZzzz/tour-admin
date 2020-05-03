@@ -24,11 +24,7 @@
                     @click="handleAdd"
                 >新增
                 </el-button>
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-input v-model="query.name" placeholder="关键字" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
@@ -70,7 +66,7 @@
                             type="text"
                             icon="el-icon-delete"
                             class="red"
-                            @click="handleDelete(scope.$index, scope.row)"
+                            @click="handleDelete(scope.row)"
                         >删除
                         </el-button>
                     </template>
@@ -79,7 +75,7 @@
             <div class="pagination">
                 <el-pagination
                     background
-                    layout="total, prev, pager, next"
+                    layout="prev, pager, next"
                     :current-page="query.pageIndex"
                     :page-size="query.pageSize"
                     :total="pageTotal * 5"
@@ -88,8 +84,8 @@
             </div>
         </div>
 
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="addVisible" width="50%">
+        <!-- 编辑新增弹出框 -->
+        <el-dialog title="编辑" :visible.sync="editVisible" width="50%">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="景点名称">
                     <el-input v-model="form.name" clearable></el-input>
@@ -134,53 +130,6 @@
                 <el-button type="primary" @click="saveAction">确 定</el-button>
             </span>
         </el-dialog>
-
-        <!--添加弹出框-->
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="50%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="景点名称">
-                    <el-input v-model="form.name" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="票价(￥)">
-                    <el-input v-model="form.ticketPrice" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="图片预览">
-                    <el-upload
-                        class="upload-demo"
-                        list-type="picture-card"
-                        name="multipartFile"
-                        action="/travel/json/admin/file/addOne"
-                        :file-list="imgList"
-                        :on-success="uploadSuccess"
-                        :on-remove="removeImg"
-                        ref="upload"
-                    >
-                        <i class="el-icon-upload"></i>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.address" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="景点简介">
-                    <el-input
-                        type="textarea"
-                        :rows="5"
-                        v-model="form.introduction"
-                        clearable
-                        maxlength="100"
-                        show-word-limit
-                    ></el-input>
-                </el-form-item>
-                <el-form-item label="备注信息">
-                    <el-input v-model="form.remark" clearable></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="cancelAction">取 消</el-button>
-                <el-button type="primary" @click="saveAction">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 
 </template>
@@ -189,7 +138,8 @@
     import {
         reqTourList,
         addTour,
-        updateTour
+        updateTour,
+        deleteTour
     } from 'api'
 
     export default {
@@ -206,12 +156,11 @@
                 multipleSelection: [],
                 delList: [],
                 editVisible: false,
-                addVisible: false,
                 pageTotal: 0,
                 form: {},
                 idx: -1,
                 id: -1,
-                tourParams: {
+                tourParams: { // 初始化参数对象
                     name: '',
                     introduction: '',
                     address: '',
@@ -219,7 +168,8 @@
                     remark: '',
                     imgUrls: []
                 },
-                imgList: []
+                imgList: [], // 图片展示数组
+                isEdit: true, // 是否是编辑操作
             }
         },
         created() {
@@ -229,13 +179,27 @@
         watch: {
             editVisible(newVal) {
                 if (!newVal) {
+                    // 清空表单中的内容
                     this.imgList = []
+                    // 深拷贝对象
+                    this.form = JSON.parse(JSON.stringify(this.tourParams))
                 }
             }
         },
         methods: {
+            async deleteFormItem(ids) {
+              let result = await deleteTour(ids)
+                if (result.data.code === 0) {
+                    this.$message.success('删除成功')
+                    this.query.pageIndex = 1
+                    this.getData()
+                } else {
+                    this.$message.error(result.data.msg)
+                }
+            },
             handleAdd() {
-                this.addVisible = true
+                this.editVisible = true
+                this.isEdit = false
             },
             removeImg(file) {
                 // 过滤掉删除的图片
@@ -249,7 +213,6 @@
             },
             uploadSuccess(res) {
                 this.form.imgUrls.push(res.data)
-
             },
             async updateTourData(data) {
                 let result = await updateTour(data)
@@ -283,18 +246,17 @@
             },
             // 触发搜索按钮
             handleSearch() {
-                this.$set(this.query, 'pageIndex', 1);
+                this.query.pageIndex = 1
                 this.getData();
             },
             // 删除操作
-            handleDelete(index, row) {
+            handleDelete({scenicSpotId}) {
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.deleteFormItem(scenicSpotId)
                     })
                     .catch(() => {
                     });
@@ -304,13 +266,11 @@
                 this.multipleSelection = val;
             },
             delAllSelection() {
-                const length = this.multipleSelection.length;
-                let str = '';
-                this.delList = this.delList.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + ' ';
-                }
-                this.$message.error(`删除了${str}`);
+                let ids = []
+                this.multipleSelection.forEach(item => {
+                    ids.push(item.scenicSpotId)
+                })
+                this.deleteFormItem(ids)
                 this.multipleSelection = [];
             },
             // 编辑操作
@@ -318,9 +278,7 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                // {name: 'food.jpg', url: "http://120.24.186.190:8080/travel/uploadFile/1588400374774201295995.png"}
-
-                // this.imgList = this.form.imgUrls
+                this.isEdit = true
                 // 格式化图片以便文件展示
                 this.form.imgUrls.forEach(item => {
                     this.imgList.push({
@@ -329,10 +287,11 @@
                     })
                 })
             },
-            // 保存编辑
+            // 保存编辑或新增
             saveAction() {
+
                 this.$refs.upload.clearFiles()
-                this.updateTourData(this.form)
+                this.isEdit ? this.updateTourData(this.form) : this.addTourData(this.form)
                 this.editVisible = false;
             },
             cancelAction() {
@@ -349,6 +308,9 @@
 </script>
 
 <style scoped>
+    >>> .el-dialog {
+        margin-top: 4vh !important;
+    }
     .handle-box {
         margin-bottom: 20px;
     }

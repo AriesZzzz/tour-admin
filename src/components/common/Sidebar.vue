@@ -62,38 +62,6 @@ export default {
                     title: '系统首页'
                 },
                 {
-                    icon: 'el-icon-lx-cascades',
-                    index: 'table',
-                    title: '基础表格'
-                },
-                {
-                    icon: 'el-icon-lx-copy',
-                    index: 'tabs',
-                    title: 'tab选项卡'
-                },
-                {
-                    icon: 'el-icon-lx-calendar',
-                    index: '3',
-                    title: '表单相关',
-                    subs: [
-                        {
-                            index: 'form',
-                            title: '基本表单'
-                        },
-                        {
-                            index: '3-2',
-                            title: '三级菜单',
-                            subs: [
-                                {
-                                    index: 'editor',
-                                    title: '富文本编辑器'
-                                },
-                            ]
-                        },
-
-                    ]
-                },
-                {
                     icon: 'el-icon-lx-pic',
                     index: 'tour',
                     title: '景点管理'
@@ -117,11 +85,6 @@ export default {
                     icon: 'el-icon-lx-message',
                     index: 'feedback',
                     title: '留言管理'
-                },
-                {
-                    icon: 'el-icon-lx-upload',
-                    index: 'upload',
-                    title: '文件上传'
                 },
 
             ]
