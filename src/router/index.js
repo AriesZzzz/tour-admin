@@ -62,11 +62,6 @@ const router =  new Router({
                     meta: {title: '订单管理', requireAuth: true}
                 },
                 {
-                    path: '/orderview',
-                    component: () => import('../components/tour_pages/OrderView.vue'),
-                    meta: {title: '订单统计', requireAuth: true}
-                },
-                {
                     path: '/feedback',
                     component: () => import( '../components/tour_pages/Feedback.vue'),
                     meta: {title: '留言管理', requireAuth: true}

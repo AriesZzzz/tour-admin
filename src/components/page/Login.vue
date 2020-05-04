@@ -69,7 +69,7 @@
                         if (result.data.code === 0) {
                             this.$message.success('登录成功');
                             window.sessionStorage.setItem('admin', this.param.username);
-                            this.$router.push('/dashboard');
+                            this.$router.push('/tour');
                         } else {
                             this.$message.error(result.data.msg)
                         }

@@ -39,10 +39,23 @@ export const uploadFiles = (multipartFile) => request(`/travel/json/admin/file/a
 }, "POST")
 
 // 用户留言
-export const reqFeedback = (userNumber, content, page, limit = 5) => request(`/travel/json/admin/feedback/list`, {
+export const reqFeedback = (userNumber, content, page, limit = 8) => request(`/travel/json/admin/feedback/list`, {
     userNumber,
     content,
     page,
     limit
+})
+
+// 订单列表
+export const reqOrderList = (scenicSpotInfo, page, limit = 8) => request(`/travel/json/admin/order/list`, {
+    scenicSpotInfo,
+    page,
+    limit
+})
+
+// 订单统计
+export const reqOrderView = (startTime,endTime) => request(`/travel/json/admin/order/stat`, {
+    startTime,
+    endTime
 })
 

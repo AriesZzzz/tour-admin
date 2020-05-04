@@ -41,8 +41,8 @@
                 background
                 @current-change="changePages"
                 layout="prev, pager, next"
-                :page-size="5"
-                :total="total * 5">
+                :page-size="8"
+                :total="total * 8">
             </el-pagination>
         </el-row>
     </div>

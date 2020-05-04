@@ -57,11 +57,6 @@ export default {
             collapse: false,
             items: [
                 {
-                    icon: 'el-icon-lx-home',
-                    index: 'dashboard',
-                    title: '系统首页'
-                },
-                {
                     icon: 'el-icon-lx-pic',
                     index: 'tour',
                     title: '景点管理'
@@ -74,10 +69,6 @@ export default {
                         {
                             index: 'ordermng',
                             title: '订单管理'
-                        },
-                        {
-                            index: 'orderview',
-                            title: '订单统计'
                         },
                     ]
                 },
